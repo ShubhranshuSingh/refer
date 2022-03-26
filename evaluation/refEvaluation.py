@@ -36,7 +36,7 @@ class RefEvaluation:
             refToGts[ref_id] = gt_sents
         refToRes = {ann['ref_id']: [ann['sent']] for ann in self.Res}
 
-        print 'tokenization...'
+        print( 'tokenization...')
         tokenizer = PTBTokenizer()
         self.refToRes = tokenizer.tokenize(refToRes)
         self.refToGts = tokenizer.tokenize(refToGts)
@@ -44,10 +44,10 @@ class RefEvaluation:
         # =================================================
         # Set up scorers
         # =================================================
-        print 'setting up scorers...'
+        print( 'setting up scorers...')
         scorers = [
             (Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"]),
-            (Meteor(),"METEOR"),
+            # (Meteor(),"METEOR"),
             (Rouge(), "ROUGE_L"),
             (Cider(), "CIDEr")
         ]
@@ -56,17 +56,17 @@ class RefEvaluation:
         # Compute scores
         # =================================================
         for scorer, method in scorers:
-            print 'computing %s score...'%(scorer.method())
+            print( 'computing %s score...'%(scorer.method()))
             score, scores = scorer.compute_score(self.refToGts, self.refToRes)
             if type(method) == list:
                 for sc, scs, m in zip(score, scores, method):
                     self.setEval(sc, m)
                     self.setRefToEvalRefs(scs, self.refToGts.keys(), m)
-                    print "%s: %0.3f"%(m, sc)
+                    print( "%s: %0.3f"%(m, sc))
             else:
                 self.setEval(score, method)
                 self.setRefToEvalRefs(scores, self.refToGts.keys(), method)
-                print "%s: %0.3f"%(method, score)
+                print( "%s: %0.3f"%(method, score))
         self.setEvalRefs()
 
     def setEval(self, score, method):
@@ -98,27 +98,27 @@ if __name__ == '__main__':
     # mimic some Res
     val_refIds = refer.getRefIds(split='test')
     ref_id = 49767
-    print "GD: %s" % refer.Refs[ref_id]['sentences']
+    print( "GD: %s" % refer.Refs[ref_id]['sentences'])
     Res = [{'ref_id': ref_id, 'sent': 'left bottle'}]
 
     # evaluate some refer expressions
     refEval = RefEvaluation(refer, Res)
     refEval.evaluate()
 
-    # print output evaluation scores
+    # print( output evaluation scores
     for metric, score in refEval.eval.items():
-        print '%s: %.3f'%(metric, score)
+        print( '%s: %.3f'%(metric, score))
 
     # demo how to use evalImgs to retrieve low score result
     # evals = [eva for eva in refEval.evalRefs if eva['CIDEr']<30]
-    # print 'ground truth sents'
+    # print( 'ground truth sents')
     # refId = evals[0]['ref_id']
-    # print 'refId: %s' % refId
-    # print [sent['sent'] for sent in refer.Refs[refId]['sentences']]
+    # print( 'refId: %s' % refId)
+    # print( [sent['sent'] for sent in refer.Refs[refId]['sentences']])
     #
-    # print 'generated sent (CIDEr score %0.1f)' % (evals[0]['CIDEr'])
+    # print( 'generated sent (CIDEr score %0.1f)' % (evals[0]['CIDEr']))
 
-    # print refEval.refToEval[8]
+    # print( refEval.refToEval[8])
 
 
 
